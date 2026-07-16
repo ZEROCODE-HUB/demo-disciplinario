@@ -1,4 +1,11 @@
-import sharp from "sharp";
+let sharp;
+try {
+  sharp = (await import("sharp")).default;
+} catch {
+  console.error("❌ sharp no está instalado. Corre: npm install --save-dev sharp");
+  process.exit(0);
+}
+
 import { readFileSync, writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
