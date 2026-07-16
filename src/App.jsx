@@ -568,7 +568,8 @@ export default function VistaTienda() {
         .campo__opcional { font-weight: 400; color: var(--muted); }
         .campo__ayuda { display: block; font-size: 11px; color: var(--muted); margin-top: 4px; }
         .campo__ayuda--pendiente { margin-top: 10px; color: var(--brass-dark); }
-        .campo input, .campo select, .campo textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; font-size: 13.5px; font-family: inherit; background: var(--surface); color: var(--ink); }
+        .campo input, .campo select, .campo textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; font-size: 16px; font-family: inherit; background: var(--surface); color: var(--ink); }
+        @media (min-width: 768px) { .campo input, .campo select, .campo textarea { font-size: 13.5px; } }
         .campo input:disabled, .campo select:disabled, .campo textarea:disabled { background: #F5F6F4; color: var(--muted); }
         .campo textarea { resize: vertical; }
 
