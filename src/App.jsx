@@ -13,6 +13,13 @@ import {
   Inbox,
   TrendingUp,
   LayoutDashboard,
+  ListChecks,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Activity,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 
 /* ---------------------------------------------------------------
@@ -424,51 +431,119 @@ function Dashboard({ casos, onAccion }) {
       </div>
 
       {tab === "resumen" ? (
-        <div className="kpis">
-          <div className="kpis__resumen">
-            <div className="kpi-card"><span className="kpi-card__valor">{kpis.total}</span><span className="kpi-card__label">Casos totales</span></div>
-            <div className="kpi-card"><span className="kpi-card__valor">{kpis.enTramite}</span><span className="kpi-card__label">En trámite</span></div>
-            <div className="kpi-card"><span className="kpi-card__valor">{kpis.cerrados}</span><span className="kpi-card__label">Cerrados</span></div>
-            <div className="kpi-card"><span className="kpi-card__valor">{kpis.tasaAprobacion}%</span><span className="kpi-card__label">Tasa de aprobación</span></div>
-            <div className="kpi-card"><span className="kpi-card__valor">2.4 días</span><span className="kpi-card__label">Tiempo promedio a cierre</span></div>
-            <div className="kpi-card"><span className="kpi-card__valor">{kpis.estaSemana}</span><span className="kpi-card__label">Casos esta semana</span></div>
+        <div className="kpi-dashboard">
+          <div className="kpi-grid">
+            <div className="kpi-card kpi-card--total">
+              <div className="kpi-card__icon"><ListChecks size={16} /></div>
+              <div className="kpi-card__content">
+                <span className="kpi-card__valor">{kpis.total}</span>
+                <span className="kpi-card__label">Casos totales</span>
+              </div>
+              <span className="kpi-card__trend kpi-card__trend--up"><ArrowUpRight size={11} /> 2 este periodo</span>
+            </div>
+            <div className="kpi-card kpi-card--tramite">
+              <div className="kpi-card__icon"><Activity size={16} /></div>
+              <div className="kpi-card__content">
+                <span className="kpi-card__valor">{kpis.enTramite}</span>
+                <span className="kpi-card__label">En trámite</span>
+              </div>
+              <span className="kpi-card__trend kpi-card__trend--neutral">{kpis.total > 0 ? Math.round(kpis.enTramite / kpis.total * 100) : 0}% del total</span>
+            </div>
+            <div className="kpi-card kpi-card--cerrados">
+              <div className="kpi-card__icon"><CheckCircle size={16} /></div>
+              <div className="kpi-card__content">
+                <span className="kpi-card__valor">{kpis.cerrados}</span>
+                <span className="kpi-card__label">Cerrados</span>
+              </div>
+              <span className="kpi-card__trend kpi-card__trend--up"><ArrowUpRight size={11} /> {kpis.cerrados > 0 ? Math.round(kpis.cerrados / Math.max(1, kpis.cerrados + kpis.enTramite) * 100) : 0}% resueltos</span>
+            </div>
+            <div className="kpi-card kpi-card--aprobacion">
+              <div className="kpi-card__icon"><TrendingUp size={16} /></div>
+              <div className="kpi-card__content">
+                <span className="kpi-card__valor">{kpis.tasaAprobacion}%</span>
+                <span className="kpi-card__label">Tasa de aprobación</span>
+              </div>
+              <span className="kpi-card__trend kpi-card__trend--up"><ArrowUpRight size={11} /> Legal aprueba</span>
+            </div>
+            <div className="kpi-card kpi-card--tiempo">
+              <div className="kpi-card__icon"><Clock size={16} /></div>
+              <div className="kpi-card__content">
+                <span className="kpi-card__valor">2.4 d</span>
+                <span className="kpi-card__label">Tiempo promedio a cierre</span>
+              </div>
+              <span className="kpi-card__trend kpi-card__trend--down"><ArrowDownRight size={11} /> -0.3 vs. mes ant.</span>
+            </div>
+            <div className="kpi-card kpi-card--semanal">
+              <div className="kpi-card__icon"><BarChart3 size={16} /></div>
+              <div className="kpi-card__content">
+                <span className="kpi-card__valor">{kpis.estaSemana}</span>
+                <span className="kpi-card__label">Casos esta semana</span>
+              </div>
+              <span className="kpi-card__trend kpi-card__trend--up"><ArrowUpRight size={11} /> +{kpis.estaSemana} vs. semana ant.</span>
+            </div>
           </div>
 
-          <div className="kpis__dos-columnas">
-            <div className="kpis__bloque">
-              <h4><TrendingUp size={14} /> Causas más frecuentes</h4>
-              {Object.entries(kpis.porFalta).map(([falta, n]) => (
-                <div className="barra" key={falta}>
-                  <span className="barra__label">{falta}</span>
-                  <div className="barra__pista"><div className="barra__relleno" style={{ width: `${(n / kpis.maxFalta) * 100}%` }} /></div>
-                  <span className="barra__valor">{n}</span>
-                </div>
-              ))}
+          <div className="kpi-analytics">
+            <div className="kpi-block">
+              <div className="kpi-block__header">
+                <TrendingUp size={14} />
+                <span>Causas más frecuentes</span>
+              </div>
+              <div className="kpi-block__body">
+                {Object.entries(kpis.porFalta).map(([falta, n]) => (
+                  <div className="kpi-bar" key={falta}>
+                    <div className="kpi-bar__top">
+                      <span className="kpi-bar__label">{falta}</span>
+                      <span className="kpi-bar__count">{n} {n === 1 ? "caso" : "casos"}</span>
+                    </div>
+                    <div className="kpi-bar__track">
+                      <div className="kpi-bar__fill" style={{ width: `${(n / kpis.maxFalta) * 100}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="kpis__bloque">
-              <h4><BarChart3 size={14} /> Distribución por gravedad</h4>
-              {Object.entries(kpis.porGravedad).map(([g, n]) => (
-                <div className="barra" key={g}>
-                  <span className="barra__label">{SEV_LABEL[g]}</span>
-                  <div className="barra__pista"><div className={`barra__relleno barra__relleno--${g}`} style={{ width: `${(n / kpis.maxGravedad) * 100}%` }} /></div>
-                  <span className="barra__valor">{n}</span>
-                </div>
-              ))}
+            <div className="kpi-block">
+              <div className="kpi-block__header">
+                <BarChart3 size={14} />
+                <span>Distribución por gravedad</span>
+              </div>
+              <div className="kpi-block__body">
+                {Object.entries(kpis.porGravedad).map(([g, n]) => (
+                  <div className="kpi-bar" key={g}>
+                    <div className="kpi-bar__top">
+                      <span className="kpi-bar__label">{SEV_LABEL[g]}</span>
+                      <span className="kpi-bar__count">{n} {n === 1 ? "caso" : "casos"}</span>
+                    </div>
+                    <div className="kpi-bar__track">
+                      <div className={`kpi-bar__fill kpi-bar__fill--${g}`} style={{ width: `${(n / kpis.maxGravedad) * 100}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="kpis__bloque kpis__actividad">
-            <h4><Clock size={14} /> Actividad reciente</h4>
-            <ul className="actividad">
-              {ACTIVIDAD_RECIENTE.map((a) => (
-                <li key={a.id + a.texto}>
-                  <span className="actividad__id">{a.id}</span>
-                  <span className="actividad__texto">{a.texto}</span>
-                  <span className="actividad__cuando">{a.cuando}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="kpi-block kpi-block--wide">
+              <div className="kpi-block__header">
+                <Clock size={14} />
+                <span>Actividad reciente</span>
+              </div>
+              <div className="kpi-block__body">
+                <ul className="kpi-feed">
+                  {ACTIVIDAD_RECIENTE.map((a) => (
+                    <li key={a.id + a.texto} className="kpi-feed__item">
+                      <span className="kpi-feed__dot" />
+                      <div className="kpi-feed__main">
+                        <span className="kpi-feed__id">{a.id}</span>
+                        <span className="kpi-feed__texto">{a.texto}</span>
+                      </div>
+                      <span className="kpi-feed__cuando">{a.cuando}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       ) : (
@@ -652,35 +727,83 @@ export default function VistaTienda() {
         .tabla__falta { color: var(--muted); }
         @media (max-width: 820px) { .tabla__fila { grid-template-columns: 1fr; gap: 4px; } .tabla__fila--cabecera { display: none; } }
 
-        .kpis__resumen { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
-        @media (max-width: 980px) { .kpis__resumen { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 560px) { .kpis__resumen { grid-template-columns: repeat(2, 1fr); } }
-        .kpi-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
-        .kpi-card__valor { font-family: 'Source Serif 4', Georgia, serif; font-size: 23px; font-weight: 600; }
-        .kpi-card__label { font-size: 11.5px; color: var(--muted); }
+        .kpi-dashboard { display: flex; flex-direction: column; gap: 20px; }
 
-        .kpis__dos-columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-        @media (max-width: 780px) { .kpis__dos-columnas { grid-template-columns: 1fr; } }
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 560px) { .kpi-grid { grid-template-columns: 1fr; } }
 
-        .kpis__bloque { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
-        .kpis__bloque h4 { display: flex; align-items: center; gap: 7px; margin: 0 0 14px; font-size: 13.5px; font-family: 'Source Serif 4', Georgia, serif; color: var(--ink); }
+        .kpi-card {
+          position: relative; background: var(--surface); border-radius: 12px; padding: 18px 18px 14px;
+          display: flex; flex-direction: column; gap: 2px; overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .kpi-card::before {
+          content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+          background: var(--kpi-color, var(--brass));
+        }
+        .kpi-card__icon {
+          position: absolute; top: 14px; right: 14px; width: 32px; height: 32px;
+          border-radius: 8px; display: flex; align-items: center; justify-content: center;
+          background: color-mix(in srgb, var(--kpi-color, var(--brass)) 12%, transparent);
+          color: var(--kpi-color, var(--brass));
+        }
+        .kpi-card__content { display: flex; flex-direction: column; gap: 0; margin-top: 4px; }
+        .kpi-card__valor { font-family: 'Source Serif 4', Georgia, serif; font-size: 28px; font-weight: 600; line-height: 1.1; color: var(--ink); }
+        .kpi-card__label { font-size: 12px; color: var(--muted); margin-top: 1px; }
+        .kpi-card__trend { display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+        .kpi-card__trend--up { color: var(--leve); }
+        .kpi-card__trend--down { color: var(--muy_grave); }
+        .kpi-card__trend--neutral { color: var(--muted); }
 
-        .barra { display: grid; grid-template-columns: 1fr 100px 24px; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12.5px; }
-        .barra__label { color: var(--muted); }
-        .barra__pista { background: #ECEEE9; border-radius: 4px; height: 8px; overflow: hidden; }
-        .barra__relleno { background: var(--brass); height: 100%; border-radius: 4px; }
-        .barra__relleno--leve { background: var(--leve); }
-        .barra__relleno--grave { background: var(--grave); }
-        .barra__relleno--muy_grave { background: var(--muy_grave); }
-        .barra__valor { text-align: right; font-weight: 600; }
+        .kpi-card--total { --kpi-color: #8A6D3B; }
+        .kpi-card--tramite { --kpi-color: #B7791F; }
+        .kpi-card--cerrados { --kpi-color: #2F6846; }
+        .kpi-card--aprobacion { --kpi-color: #2C4C8C; }
+        .kpi-card--tiempo { --kpi-color: #6B4C8C; }
+        .kpi-card--semanal { --kpi-color: #2C7A7A; }
 
-        .actividad { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-        .actividad li { display: grid; grid-template-columns: 105px 1fr auto; gap: 10px; align-items: baseline; font-size: 12.5px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
-        .actividad li:last-child { border-bottom: none; padding-bottom: 0; }
-        .actividad__id { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--brass-dark); }
-        .actividad__texto { color: var(--ink); }
-        .actividad__cuando { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
-        @media (max-width: 620px) { .actividad li { grid-template-columns: 1fr; gap: 2px; } }
+        .kpi-analytics { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media (max-width: 780px) { .kpi-analytics { grid-template-columns: 1fr; } }
+
+        .kpi-block {
+          background: var(--surface); border-radius: 12px; overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .kpi-block--wide { grid-column: 1 / -1; }
+        .kpi-block__header {
+          display: flex; align-items: center; gap: 8px;
+          padding: 14px 18px; border-bottom: 1px solid var(--line);
+          font-size: 12.5px; font-weight: 600; color: var(--ink);
+          background: #FAFBF9;
+        }
+        .kpi-block__body { padding: 14px 18px; }
+
+        .kpi-bar { margin-bottom: 14px; }
+        .kpi-bar:last-child { margin-bottom: 0; }
+        .kpi-bar__top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
+        .kpi-bar__label { font-size: 12.5px; color: var(--ink); }
+        .kpi-bar__count { font-size: 11px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+        .kpi-bar__track { height: 6px; background: #ECEEE9; border-radius: 4px; overflow: hidden; }
+        .kpi-bar__fill { height: 100%; border-radius: 4px; background: var(--brass); transition: width 0.6s ease; }
+        .kpi-bar__fill--leve { background: var(--leve); }
+        .kpi-bar__fill--grave { background: var(--grave); }
+        .kpi-bar__fill--muy_grave { background: var(--muy_grave); }
+
+        .kpi-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+        .kpi-feed__item {
+          display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: center;
+          padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 12.5px;
+        }
+        .kpi-feed__item:last-child { border-bottom: none; }
+        .kpi-feed__dot {
+          width: 8px; height: 8px; border-radius: 50%; background: var(--brass);
+          opacity: 0.5; flex-shrink: 0;
+        }
+        .kpi-feed__main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+        .kpi-feed__id { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--brass-dark); }
+        .kpi-feed__texto { color: var(--ink); }
+        .kpi-feed__cuando { font-size: 11px; color: var(--muted); white-space: nowrap; }
       `}</style>
 
       <div className="topbar">
