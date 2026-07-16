@@ -1,5 +1,9 @@
 import React, { useState, useMemo } from "react";
 import {
+  PieChart, Pie, Cell, ResponsiveContainer as PieResponsive,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer as LineResponsive,
+} from "recharts";
+import {
   FileText,
   Send,
   CheckCircle2,
@@ -71,6 +75,17 @@ const ACTIVIDAD_RECIENTE = [
   { id: "EXP-2026-0141", texto: "entregado al trabajador, falta subir cargo firmado", cuando: "hace 3 días" },
   { id: "EXP-2026-0137", texto: "rechazado por Legal — falta sustento adicional", cuando: "hace 2 semanas" },
 ];
+
+const SEMANAS = [
+  { semana: "S-1", casos: 0 },
+  { semana: "S-2", casos: 1 },
+  { semana: "S-3", casos: 2 },
+  { semana: "S-4", casos: 1 },
+  { semana: "S-5", casos: 1 },
+  { semana: "S-6", casos: 3 },
+];
+
+const GRAVEDAD_COLORS = { leve: "#2F6846", grave: "#B7791F", muy_grave: "#9B2C2C" };;
 
 /* ---------------------------------------------------------------
    COMPONENTES DE APOYO
@@ -509,18 +524,42 @@ function Dashboard({ casos, onAccion }) {
                 <BarChart3 size={14} />
                 <span>Distribución por gravedad</span>
               </div>
+              <div className="kpi-block__body kpi-block__body--center">
+                <PieResponsive width="100%" height={200}>
+                  <PieChart>
+                    <Pie data={Object.entries(kpis.porGravedad).map(([g, n]) => ({ name: SEV_LABEL[g], value: n, color: GRAVEDAD_COLORS[g] }))} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={3} dataKey="value">
+                      {Object.entries(kpis.porGravedad).map(([g]) => (<Cell key={g} fill={GRAVEDAD_COLORS[g]} />))}
+                    </Pie>
+                    <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid var(--line)" }} />
+                  </PieChart>
+                </PieResponsive>
+                <div className="kpi-legend">
+                  {Object.entries(kpis.porGravedad).map(([g, n]) => (
+                    <div className="kpi-legend__item" key={g}>
+                      <span className="kpi-legend__dot" style={{ background: GRAVEDAD_COLORS[g] }} />
+                      <span className="kpi-legend__label">{SEV_LABEL[g]}</span>
+                      <span className="kpi-legend__count">{n}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="kpi-block kpi-block--wide">
+              <div className="kpi-block__header">
+                <Activity size={14} />
+                <span>Tendencia semanal de casos</span>
+              </div>
               <div className="kpi-block__body">
-                {Object.entries(kpis.porGravedad).map(([g, n]) => (
-                  <div className="kpi-bar" key={g}>
-                    <div className="kpi-bar__top">
-                      <span className="kpi-bar__label">{SEV_LABEL[g]}</span>
-                      <span className="kpi-bar__count">{n} {n === 1 ? "caso" : "casos"}</span>
-                    </div>
-                    <div className="kpi-bar__track">
-                      <div className={`kpi-bar__fill kpi-bar__fill--${g}`} style={{ width: `${(n / kpis.maxGravedad) * 100}%` }} />
-                    </div>
-                  </div>
-                ))}
+                <LineResponsive width="100%" height={200}>
+                  <LineChart data={SEMANAS} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#ECEEE9" vertical={false} />
+                    <XAxis dataKey="semana" tick={{ fontSize: 11, fill: "#5B6660" }} axisLine={{ stroke: "#D9DED8" }} tickLine={false} />
+                    <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: "#5B6660" }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid var(--line)" }} />
+                    <Line type="monotone" dataKey="casos" stroke="#8A6D3B" strokeWidth={2} dot={{ fill: "#8A6D3B", strokeWidth: 0, r: 4 }} activeDot={{ r: 6, fill: "#8A6D3B" }} />
+                  </LineChart>
+                </LineResponsive>
               </div>
             </div>
 
@@ -729,7 +768,8 @@ export default function VistaTienda() {
 
         .kpi-dashboard { display: flex; flex-direction: column; gap: 20px; }
 
-        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+        @media (max-width: 1200px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 560px) { .kpi-grid { grid-template-columns: 1fr; } }
 
@@ -778,6 +818,7 @@ export default function VistaTienda() {
           background: #FAFBF9;
         }
         .kpi-block__body { padding: 14px 18px; }
+        .kpi-block__body--center { display: flex; flex-direction: column; align-items: center; }
 
         .kpi-bar { margin-bottom: 14px; }
         .kpi-bar:last-child { margin-bottom: 0; }
@@ -789,6 +830,12 @@ export default function VistaTienda() {
         .kpi-bar__fill--leve { background: var(--leve); }
         .kpi-bar__fill--grave { background: var(--grave); }
         .kpi-bar__fill--muy_grave { background: var(--muy_grave); }
+
+        .kpi-legend { display: flex; gap: 18px; margin-top: 8px; flex-wrap: wrap; justify-content: center; }
+        .kpi-legend__item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+        .kpi-legend__dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .kpi-legend__label { color: var(--muted); }
+        .kpi-legend__count { font-weight: 600; color: var(--ink); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
 
         .kpi-feed { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
         .kpi-feed__item {
