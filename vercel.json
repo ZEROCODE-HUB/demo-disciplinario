@@ -1,4 +1,5 @@
 {
+  "installCommand": "chmod -R +x node_modules/.bin 2>/dev/null; npm rebuild 2>/dev/null; npm install",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite"
